@@ -3,10 +3,12 @@ package me.amryousef.webrtc_demo
 import android.Manifest
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
@@ -29,6 +31,7 @@ import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
 
+
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 class MainActivity : AppCompatActivity() {
@@ -47,6 +50,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var emojiController: EmojiController
 
+    private var torchStatus = false
+
     private val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
             super.onCreateSuccess(p0)
@@ -62,7 +67,8 @@ class MainActivity : AppCompatActivity() {
 
         editionController = EditionController(drawingController, BuildConfig.IS_ADMIN, DrawingEventsDispatcher(signallingClient))
         if (BuildConfig.IS_ADMIN) {
-            drawOnScreen.visibility = View.VISIBLE
+            drawOnScreen.visibility = VISIBLE
+            flashlight.visibility = GONE
             drawOnScreen.setOnClickListener {
                 if (editionController.isEditing) {
                     videoContainerView.setOnTouchListener(null)
@@ -70,6 +76,20 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     editionController.startEditing()
                     videoContainerView.setOnTouchListener(editionController)
+                }
+            }
+        } else {
+            flashlight.visibility = VISIBLE
+            drawOnScreen.visibility = GONE
+            flashlight.setOnClickListener {
+                val cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+                try {
+                    torchStatus = !torchStatus
+                    cameraManager.cameraIdList.forEach {
+                        cameraManager.setTorchMode(it, torchStatus)
+                    }
+                } catch (e: CameraAccessException) {
+                    e.printStackTrace()
                 }
             }
         }
