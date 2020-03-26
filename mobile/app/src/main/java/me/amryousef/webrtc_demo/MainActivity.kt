@@ -100,11 +100,12 @@ class MainActivity : AppCompatActivity() {
         }
         checkCameraPermission()
         setupEmojis()
+        mute.setOnClickListener {  }
     }
 
     private fun setUpShowHideControls() {
         var controlsShown = true
-        local_view.setOnClickListener {
+        videoContainerView.setOnClickListener {
             val visibility = if (controlsShown) GONE else VISIBLE
             controlsShown = !controlsShown
             if (!remoteViewLoaded) {
