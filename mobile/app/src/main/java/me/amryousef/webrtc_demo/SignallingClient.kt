@@ -1,7 +1,7 @@
 package me.amryousef.webrtc_demo
 
 import android.util.Log
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -12,14 +12,10 @@ import io.ktor.client.features.websocket.ws
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
 import io.ktor.util.KtorExperimentalAPI
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 
@@ -35,7 +31,11 @@ class SignallingClient(
 
     private val job = Job()
 
-    private val gson = Gson()
+    private val gson = GsonBuilder().apply {
+        registerTypeAdapter(TouchEvent::class.java, TouchEventAdapter())
+    }.create()
+
+    private val touchEventsPublisher = PublishSubject.create<TouchEvent>()
 
     override val coroutineContext = Dispatchers.IO + job
 
@@ -48,7 +48,7 @@ class SignallingClient(
 
     private val sendChannel = ConflatedBroadcastChannel<String>()
 
-    init {
+    fun start() {
         connect()
     }
 
@@ -75,19 +75,37 @@ class SignallingClient(
                                     listener.onOfferReceived(gson.fromJson(jsonObject, SessionDescription::class.java))
                                 } else if (jsonObject.has("type") && jsonObject.get("type").asString == "ANSWER") {
                                     listener.onAnswerReceived(gson.fromJson(jsonObject, SessionDescription::class.java))
+                                } else {
+                                    try {
+                                        val touchEvent = gson.fromJson(data, TouchEvent::class.java)
+                                        touchEventsPublisher.onNext(touchEvent)
+                                    } catch (throwable: Throwable) {
+                                        Log.d("ERROR", "error $throwable")
+                                        // gotta catch them all
+                                    }
                                 }
                             }
                         }
                     }
                 }
             } catch (exception: Throwable) {
-                Log.e("SignallingClient","Failed due to exception: ",exception)
+                Log.e("SignallingClient", "Failed due to exception: ", exception)
             }
         }
     }
 
+    fun wsTouchEvents(): Observable<TouchEvent> = touchEventsPublisher
+
     fun send(dataObject: Any?) = runBlocking {
         sendChannel.send(gson.toJson(dataObject))
+    }
+
+    fun sendFromIO(dataObject: Any?) {
+        launch {
+            withContext(Dispatchers.IO) {
+                sendChannel.send(gson.toJson(dataObject))
+            }
+        }
     }
 
     fun destroy() {

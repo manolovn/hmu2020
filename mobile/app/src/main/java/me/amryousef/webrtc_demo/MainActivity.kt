@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var rtcClient: RTCClient
-    private lateinit var signallingClient: SignallingClient
+    private val signallingClient: SignallingClient = SignallingClient(createSignallingClientListener())
 
     private lateinit var drawingController: DrawingController
     private lateinit var editionController: EditionController
@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         drawingController = DrawingController(local_view)
-        editionController = EditionController(drawingController)
+
+        editionController = EditionController(drawingController, BuildConfig.IS_ADMIN, DrawingEventsDispatcher(signallingClient))
         if (BuildConfig.IS_ADMIN) {
             drawOnScreen.visibility = View.VISIBLE
             drawOnScreen.setOnClickListener {
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) != PackageManager.PERMISSION_GRANTED
-            || ContextCompat.checkSelfPermission(this, AUDIO_RECORD_PERMISSION) != PackageManager.PERMISSION_GRANTED ) {
+            || ContextCompat.checkSelfPermission(this, AUDIO_RECORD_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         } else {
             onCameraPermissionGranted()
@@ -92,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         rtcClient.initSurfaceView(local_view)
 
         rtcClient.startLocalVideoCapture(local_view)
-        signallingClient = SignallingClient(createSignallingClientListener())
+        signallingClient.start()
         videoOff.setOnClickListener {
             rtcClient.call(sdpObserver)
         }

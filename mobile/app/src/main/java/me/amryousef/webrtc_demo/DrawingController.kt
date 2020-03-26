@@ -1,16 +1,17 @@
 package me.amryousef.webrtc_demo
 
-import android.graphics.Path
 import android.util.Log
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
-sealed class DrawingCommand {
-    object None : DrawingCommand()
-    data class TouchedUpContent(val path: Path, val circlePath: Path): DrawingCommand()
-    data class Content(val path: Path, val circlePath: Path) : DrawingCommand()
-    object Clear : DrawingCommand()
+sealed class TouchEvent {
+    abstract val type: String
+
+    data class None(override val type: String = TouchEventType.None) : TouchEvent()
+    data class ActionDown(val x: Float, val y: Float, override val type: String = TouchEventType.ActionDown) : TouchEvent()
+    data class ActionMove(val x: Float, val y: Float, override val type: String = TouchEventType.ActionMove) : TouchEvent()
+    data class ActionUp(override val type: String = TouchEventType.ActionUp) : TouchEvent()
 }
 
 class DrawingController(private val drawingView: CameraDrawingView) {
@@ -24,18 +25,14 @@ class DrawingController(private val drawingView: CameraDrawingView) {
         drawingSubscriptions.clear()
     }
 
-    fun bindDrawingCommands(stream: Observable<DrawingCommand>) {
+    fun bindDrawingCommands(stream: Observable<TouchEvent>) {
         stream
-            .retry()
-            .distinctUntilChanged()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(::onDrawCommand, ::logError)
+            .subscribe(::onTouchEvent, ::logError)
             .also { drawingSubscriptions.add(it) }
     }
 
-    private fun onDrawCommand(drawCommand: DrawingCommand) {
-        drawingView.commandToPaint = drawCommand
-        drawingView.invalidate()
+    private fun onTouchEvent(touchEvent: TouchEvent) {
+        drawingView.mOnTouchEvent(touchEvent)
     }
 
     private fun logError(throwable: Throwable) {
