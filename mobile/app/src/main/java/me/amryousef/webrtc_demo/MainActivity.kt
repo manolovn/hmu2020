@@ -2,10 +2,7 @@ package me.amryousef.webrtc_demo
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Canvas
 import android.os.Bundle
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -80,6 +77,9 @@ class MainActivity : AppCompatActivity() {
         videoOff.setOnClickListener {
             rtcClient.call(sdpObserver)
             drawingController.submitCommand()
+        }
+        switch_camera_button.setOnClickListener {
+            rtcClient.switchCamera()
         }
     }
 

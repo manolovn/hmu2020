@@ -2,6 +2,7 @@ package me.amryousef.webrtc_demo
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import org.webrtc.*
 
 class RTCClient(
@@ -154,5 +155,17 @@ class RTCClient(
 
     fun addIceCandidate(iceCandidate: IceCandidate?) {
         peerConnection?.addIceCandidate(iceCandidate)
+    }
+
+    fun switchCamera() {
+        videoCapturer.switchCamera(object: CameraVideoCapturer.CameraSwitchHandler {
+            override fun onCameraSwitchDone(p0: Boolean) {
+                Log.d("xxx", "yuju")
+            }
+
+            override fun onCameraSwitchError(p0: String?) {
+                Log.d("xxx", "fuck")
+            }
+        })
     }
 }
