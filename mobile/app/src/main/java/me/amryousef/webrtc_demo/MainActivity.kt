@@ -23,11 +23,13 @@ import io.ktor.util.KtorExperimentalAPI
 import kotlinx.android.synthetic.main.actions.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import me.amryousef.webrtc_demo.emoji.Emoji
 import me.amryousef.webrtc_demo.emoji.EmojiAdapter
 import me.amryousef.webrtc_demo.emoji.EmojiController
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
+import java.lang.Exception
 import kotlinx.android.synthetic.main.activity_main.actions as mainActions
 
 @ExperimentalCoroutinesApi
@@ -240,36 +242,35 @@ class MainActivity : AppCompatActivity() {
             rtcClient.addIceCandidate(iceCandidate)
         }
 
-        override fun onEmojiReceived(emojiCode: Int) {
-            ParticleSystem(this@MainActivity, 24, emojiController.getEmojiById(emojiCode).image, 1500L)
-                .setSpeedRange(0.2f, 0.5f)
-                .oneShot(emojis_view, 6)
-
-            /*emojis_view.setImageResource(emojiController.getEmojiById(emojiCode).image)
-            val deltaY: Float = emojis_view.bottom + 3F
-            val anim = ObjectAnimator.ofFloat(emojis_view, "translationY", emojis_view.bottom.toFloat(), deltaY)
-            anim.duration = 500
-            anim.interpolator = AccelerateDecelerateInterpolator()
-            val fadeAnim = ObjectAnimator.ofFloat(emojis_view, "alpha", 0f, 1f)
-            anim.duration = 350
-            val animatorSet = AnimatorSet()
-            //animatorSet.play(anim)
-            animatorSet.play(fadeAnim)
-            animatorSet.start()
-            object : CountDownTimer(1500, 1000) {
-                override fun onFinish() {
-                    emojis_view.setImageResource(0)
+        override fun onEmojiReceived(emojiCode: Int, sender: Boolean) {
+            val emoji = emojiController.getEmojiById(emojiCode)
+            if (sender) {
+                try {
+                    drawEmojisRelative(emoji)
+                } catch (e: Exception) {
+                    drawEmojisInCenter(emoji)
                 }
-
-                override fun onTick(millisUntilFinished: Long) {
-
-                }
-            }.start()*/
+            } else {
+                drawEmojisInCenter(emoji)
+            }
         }
 
         override fun onEndCallReceived() {
             finish()
         }
+    }
+
+    private fun drawEmojisInCenter(emoji: Emoji) {
+        ParticleSystem(this@MainActivity, 24, emoji.image, 1500L)
+            .setSpeedRange(0.2f, 0.5f)
+            .oneShot(emojis_view, 6)
+    }
+
+    private fun drawEmojisRelative(emoji: Emoji) {
+        val c = emojisList.findViewHolderForAdapterPosition(emoji.id)?.itemView
+        ParticleSystem(this@MainActivity, 24, emoji.image, 1500L)
+            .setSpeedRange(0.2f, 0.5f)
+            .oneShot(c, 6)
     }
 
     private fun requestCameraPermission(dialogShown: Boolean = false) {

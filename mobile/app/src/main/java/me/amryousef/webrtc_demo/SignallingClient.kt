@@ -79,7 +79,7 @@ class SignallingClient(
                                 } else if (jsonObject.has("type") && jsonObject.get("type").asString == "ANSWER") {
                                     listener.onAnswerReceived(gson.fromJson(jsonObject, SessionDescription::class.java))
                                 } else if (jsonObject.has("type") && jsonObject.get("type").asString == "EMOJI") {
-                                    listener.onEmojiReceived(jsonObject.get("emojiCode").asInt)
+                                    listener.onEmojiReceived(jsonObject.get("emojiCode").asInt, false)
                                 } else if (jsonObject.has("type") && jsonObject.get("type").asString == END_CALL_COMMAND_ID) {
                                     listener.onEndCallReceived()
                                 } else {
@@ -123,7 +123,7 @@ class SignallingClient(
     fun sendEmoji(it: Int) = runBlocking {
         val emojiObject = EmojiCommand("EMOJI", it)
         sendChannel.send(gson.toJson(emojiObject))
-        listener.onEmojiReceived(it)
+        listener.onEmojiReceived(it, true)
     }
 
     fun endCall() = runBlocking {
