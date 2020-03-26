@@ -4,32 +4,103 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 import org.webrtc.SurfaceViewRenderer
+import kotlin.math.abs
 
 class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRenderer(context, attrs) {
 
-    var commandToPaint: DrawingCommand = DrawingCommand.None
+    private var touchingUp = false
+
+    private val paint = Paint().apply {
+        isAntiAlias = true
+        isDither = true
+        color = Color.GREEN
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 12F
+    }
+
+    private val circlePaint = Paint().apply {
+        isAntiAlias = true
+        color = Color.BLUE
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.MITER
+        strokeWidth = 4f
+    }
 
     init {
         setWillNotDraw(false)
         visibility = View.VISIBLE
     }
 
-    private val paintLine = Paint().apply {
-        isAntiAlias = true
-        color = Color.RED
-        strokeWidth = 5F
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        when (commandToPaint) {
-            DrawingCommand.None -> Unit
-            is DrawingCommand.Line -> canvas.drawLine(50F, 50f, 300f, 300F, paintLine)
-            DrawingCommand.Clear -> canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        if (touchingUp) {
+            canvas.drawPath(mPath, paint)
+            mPath.reset()
         }
+        canvas.drawPath(mPath, paint)
+        canvas.drawPath(circlePath, circlePaint)
+    }
+
+    private val mPath = Path()
+    private val circlePath = Path()
+    private var mX = 0f
+    private var mY = 0f
+
+    private fun onTouchStart(x: Float, y: Float) {
+        mPath.reset()
+        mPath.moveTo(x, y)
+        mX = x
+        mY = y
+    }
+
+    private fun onTouchMove(x: Float, y: Float) {
+        val dx = abs(x - mX)
+        val dy: Float = abs(y - mY)
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2)
+            mX = x
+            mY = y
+            circlePath.reset()
+            circlePath.addCircle(mX, mY, 30F, Path.Direction.CW)
+        }
+    }
+
+    private fun onTouchUp() {
+        mPath.lineTo(mX, mY)
+        circlePath.reset()
+    }
+
+    fun mOnTouchEvent(event: TouchEvent) {
+        when (event) {
+            is TouchEvent.ActionDown -> {
+                val x = event.x
+                val y = event.y
+                touchingUp = false
+                onTouchStart(x, y)
+                invalidate()
+            }
+            is TouchEvent.ActionMove -> {
+                val x = event.x
+                val y = event.y
+                touchingUp = false
+                onTouchMove(x, y)
+                invalidate()
+            }
+            is TouchEvent.ActionUp -> {
+                touchingUp = true
+                onTouchUp()
+                invalidate()
+            }
+        }
+    }
+
+    private companion object {
+        const val TOUCH_TOLERANCE = 4f
     }
 }

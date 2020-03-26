@@ -6,11 +6,11 @@ import android.animation.ObjectAnimator
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,7 +28,6 @@ import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
 
-
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 class MainActivity : AppCompatActivity() {
@@ -40,9 +39,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var rtcClient: RTCClient
-    private lateinit var signallingClient: SignallingClient
+    private val signallingClient: SignallingClient = SignallingClient(createSignallingClientListener())
 
     private lateinit var drawingController: DrawingController
+    private lateinit var editionController: EditionController
 
     private lateinit var emojiController: EmojiController
 
@@ -58,6 +58,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         drawingController = DrawingController(local_view)
+
+        editionController = EditionController(drawingController, BuildConfig.IS_ADMIN, DrawingEventsDispatcher(signallingClient))
+        if (BuildConfig.IS_ADMIN) {
+            drawOnScreen.visibility = View.VISIBLE
+            drawOnScreen.setOnClickListener {
+                if (editionController.isEditing) {
+                    videoContainerView.setOnTouchListener(null)
+                    editionController.stopEditing()
+                } else {
+                    editionController.startEditing()
+                    videoContainerView.setOnTouchListener(editionController)
+                }
+            }
+        }
         checkCameraPermission()
         setupEmojis()
     }
@@ -71,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) != PackageManager.PERMISSION_GRANTED
-            || ContextCompat.checkSelfPermission(this, AUDIO_RECORD_PERMISSION) != PackageManager.PERMISSION_GRANTED ) {
+            || ContextCompat.checkSelfPermission(this, AUDIO_RECORD_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         } else {
             onCameraPermissionGranted()
@@ -99,10 +113,9 @@ class MainActivity : AppCompatActivity() {
         rtcClient.initSurfaceView(local_view)
 
         rtcClient.startLocalVideoCapture(local_view)
-        signallingClient = SignallingClient(createSignallingClientListener())
+        signallingClient.start()
         videoOff.setOnClickListener {
             rtcClient.call(sdpObserver)
-            drawingController.submitCommand()
         }
         switchCamera.setOnClickListener {
             rtcClient.switchCamera()
