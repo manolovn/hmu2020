@@ -10,6 +10,7 @@ import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
@@ -32,7 +33,7 @@ import me.amryousef.webrtc_demo.emoji.EmojiController
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
-
+import kotlinx.android.synthetic.main.activity_main.actions as mainActions
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 class MainActivity : AppCompatActivity() {
@@ -51,6 +52,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var emojiController: EmojiController
 
+    private var remoteViewLoaded = false
+    private var showingEmojiList = false
     private var torchStatus = false
 
     private val sdpObserver = object : AppSdpObserver() {
@@ -66,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         drawingController = DrawingController(local_view)
 
+        setUpShowHideControls()
         editionController = EditionController(drawingController, BuildConfig.IS_ADMIN, DrawingEventsDispatcher(signallingClient))
         if (BuildConfig.IS_ADMIN) {
             drawOnScreen.visibility = VISIBLE
@@ -96,6 +100,23 @@ class MainActivity : AppCompatActivity() {
         }
         checkCameraPermission()
         setupEmojis()
+    }
+
+    private fun setUpShowHideControls() {
+        var controlsShown = true
+        local_view.setOnClickListener {
+            val visibility = if (controlsShown) GONE else VISIBLE
+            controlsShown = !controlsShown
+            if (!remoteViewLoaded) {
+                remote_view_loading.visibility = visibility
+            }
+            if (showingEmojiList) {
+                emojisList.visibility = visibility
+            }
+            val rightTopCornerControl = if (BuildConfig.IS_ADMIN) drawOnScreen else flashlight
+            val controlsToHide = arrayOf(screen_title, rightTopCornerControl, remote_view, mainActions)
+            controlsToHide.forEach { it.visibility = visibility }
+        }
     }
 
     private fun setupEmojis() {
@@ -158,9 +179,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun showEmojisPanel() {
         if (emojisList.visibility == VISIBLE) {
+            showingEmojiList = false
             emojisList.isSelected = false
             emojisList.visibility = GONE
         } else {
+            showingEmojiList = true
             emojisList.isSelected = true
             emojisList.visibility = VISIBLE
         }
@@ -175,6 +198,7 @@ class MainActivity : AppCompatActivity() {
             rtcClient.onRemoteSessionReceived(description)
             rtcClient.answer(sdpObserver)
             remote_view_loading.isGone = true
+            remoteViewLoaded = true
         }
 
         override fun onAnswerReceived(description: SessionDescription) {
@@ -202,10 +226,11 @@ class MainActivity : AppCompatActivity() {
             //animatorSet.play(anim)
             animatorSet.play(fadeAnim)
             animatorSet.start()
-            object:CountDownTimer(1500, 1000) {
+            object : CountDownTimer(1500, 1000) {
                 override fun onFinish() {
                     emojis_view.setImageResource(0)
                 }
+
                 override fun onTick(millisUntilFinished: Long) {
 
                 }
