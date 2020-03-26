@@ -9,4 +9,5 @@ interface SignallingClientListener {
     fun onAnswerReceived(description: SessionDescription)
     fun onIceCandidateReceived(iceCandidate: IceCandidate)
     fun onEmojiReceived(emojiCode: Int)
+    fun onEndCallReceived()
 }
