@@ -12,6 +12,7 @@ class RTCClient(
 
     companion object {
         private const val LOCAL_TRACK_ID = "local_track"
+        private const val LOCAL_AUDIO_TRACK_ID = "local_audio_track"
         private const val LOCAL_STREAM_ID = "local_track"
     }
 
@@ -29,12 +30,13 @@ class RTCClient(
     private val peerConnectionFactory by lazy { buildPeerConnectionFactory() }
     private val videoCapturer by lazy { getVideoCapturer(context) }
     private val localVideoSource by lazy { peerConnectionFactory.createVideoSource(false) }
+    private val localAudioSource by lazy { peerConnectionFactory.createAudioSource(MediaConstraints()) }
     private val peerConnection by lazy { buildPeerConnection(observer) }
 
     private fun initPeerConnectionFactory(context: Application) {
         val options = PeerConnectionFactory.InitializationOptions.builder(context)
             .setEnableInternalTracer(true)
-            .setFieldTrials("WebRTC-H264HighProfile/Enabled/")
+            .setFieldTrials("WebRTC-IntelVP8/Enabled")
             .createInitializationOptions()
         PeerConnectionFactory.initialize(options)
     }
@@ -77,8 +79,11 @@ class RTCClient(
         videoCapturer.startCapture(320, 240, 60)
         val localVideoTrack = peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
         localVideoTrack.addSink(localVideoOutput)
+        val localAudioTrack = peerConnectionFactory.createAudioTrack(LOCAL_AUDIO_TRACK_ID, localAudioSource)
+        localAudioTrack.setEnabled(true)
         val localStream = peerConnectionFactory.createLocalMediaStream(LOCAL_STREAM_ID)
         localStream.addTrack(localVideoTrack)
+        localStream.addTrack(localAudioTrack)
         peerConnection?.addStream(localStream)
     }
 
