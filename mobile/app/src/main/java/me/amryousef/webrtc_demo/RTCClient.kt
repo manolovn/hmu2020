@@ -2,19 +2,8 @@ package me.amryousef.webrtc_demo
 
 import android.app.Application
 import android.content.Context
-import org.webrtc.Camera2Enumerator
-import org.webrtc.DefaultVideoDecoderFactory
-import org.webrtc.DefaultVideoEncoderFactory
-import org.webrtc.EglBase
-import org.webrtc.IceCandidate
-import org.webrtc.MediaConstraints
-import org.webrtc.PeerConnection
-import org.webrtc.PeerConnectionFactory
-import org.webrtc.SdpObserver
-import org.webrtc.SessionDescription
-import org.webrtc.SurfaceTextureHelper
-import org.webrtc.SurfaceViewRenderer
-import org.webrtc.VideoCapturer
+import android.util.Log
+import org.webrtc.*
 
 class RTCClient(
     context: Application,
@@ -27,6 +16,7 @@ class RTCClient(
     }
 
     private val rootEglBase: EglBase = EglBase.create()
+    var useFrontCamera = true
 
     init {
         initPeerConnectionFactory(context)
@@ -70,7 +60,11 @@ class RTCClient(
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
             deviceNames.find {
-                isFrontFacing(it)
+                if (useFrontCamera) {
+                    isFrontFacing(it)
+                } else {
+                    isBackFacing(it)
+                }
             }?.let {
                 createCapturer(it, null)
             } ?: throw IllegalStateException()
@@ -82,7 +76,8 @@ class RTCClient(
         init(rootEglBase.eglBaseContext, null)
     }
 
-    fun startLocalVideoCapture(localVideoOutput: SurfaceViewRenderer) {
+    fun startLocalVideoCapture(localVideoOutput: SurfaceViewRenderer, isFrontCamera: Boolean) {
+        this.useFrontCamera = isFrontCamera
         val surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
         (videoCapturer as VideoCapturer).initialize(surfaceTextureHelper, localVideoOutput.context, localVideoSource.capturerObserver)
         videoCapturer.startCapture(320, 240, 60)
@@ -166,5 +161,17 @@ class RTCClient(
 
     fun addIceCandidate(iceCandidate: IceCandidate?) {
         peerConnection?.addIceCandidate(iceCandidate)
+    }
+
+    fun switchCamera() {
+        videoCapturer.switchCamera(object: CameraVideoCapturer.CameraSwitchHandler {
+            override fun onCameraSwitchDone(p0: Boolean) {
+                Log.d("xxx", "yuju")
+            }
+
+            override fun onCameraSwitchError(p0: String?) {
+                Log.d("xxx", "fuck")
+            }
+        })
     }
 }

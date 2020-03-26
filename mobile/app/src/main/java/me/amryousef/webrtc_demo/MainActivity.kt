@@ -10,10 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import io.ktor.util.KtorExperimentalAPI
-import kotlinx.android.synthetic.main.activity_main.call_button
-import kotlinx.android.synthetic.main.activity_main.local_view
-import kotlinx.android.synthetic.main.activity_main.remote_view
-import kotlinx.android.synthetic.main.activity_main.remote_view_loading
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
@@ -70,9 +67,12 @@ class MainActivity : AppCompatActivity() {
         )
         rtcClient.initSurfaceView(remote_view)
         rtcClient.initSurfaceView(local_view)
-        rtcClient.startLocalVideoCapture(local_view)
+        rtcClient.startLocalVideoCapture(local_view, true)
         signallingClient = SignallingClient(createSignallingClientListener())
         call_button.setOnClickListener { rtcClient.call(sdpObserver) }
+        switch_camera_button.setOnClickListener {
+            rtcClient.switchCamera()
+        }
     }
 
     private fun createSignallingClientListener() = object : SignallingClientListener {
