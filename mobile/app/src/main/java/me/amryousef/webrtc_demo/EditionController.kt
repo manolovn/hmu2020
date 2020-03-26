@@ -35,6 +35,11 @@ class EditionController(
         isEditing = false
     }
 
+    fun clear() {
+        touchEvents.onNext(TouchEvent.Clear())
+        drawingEventsDispatcher.dispatch(TouchEvent.Clear())
+    }
+
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y

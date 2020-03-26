@@ -30,6 +30,18 @@
             android:src="@drawable/ic_baseline_close_24"
             tools:visibility="visible"/>
 
+    <ImageView
+            android:id="@+id/clearDrawing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingConstraints"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_actions_list_selector"
+            android:src="@drawable/ic_baseline_clear_all_24"
+            app:layout_constraintTop_toBottomOf="@id/closeEdition"
+            app:layout_constraintEnd_toEndOf="@id/closeEdition"
+            app:layout_constraintStart_toStartOf="@id/closeEdition"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/topElementsContainer"
             android:layout_width="match_parent"

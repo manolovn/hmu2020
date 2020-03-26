@@ -1,10 +1,7 @@
 package me.amryousef.webrtc_demo
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import org.webrtc.SurfaceViewRenderer
@@ -13,6 +10,7 @@ import kotlin.math.abs
 class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRenderer(context, attrs) {
 
     private var touchingUp = false
+    private var clearingCanvas = false
 
     private val paint = Paint().apply {
         isAntiAlias = true
@@ -39,9 +37,15 @@ class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRend
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (touchingUp) {
-            canvas.drawPath(mPath, paint)
-            mPath.reset()
+        when {
+            touchingUp -> {
+                canvas.drawPath(mPath, paint)
+                mPath.reset()
+            }
+            clearingCanvas -> {
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+                return
+            }
         }
         canvas.drawPath(mPath, paint)
         canvas.drawPath(circlePath, circlePaint)
@@ -82,6 +86,7 @@ class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRend
                 val x = event.x
                 val y = event.y
                 touchingUp = false
+                clearingCanvas = false
                 onTouchStart(x, y)
                 invalidate()
             }
@@ -89,12 +94,19 @@ class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRend
                 val x = event.x
                 val y = event.y
                 touchingUp = false
+                clearingCanvas = false
                 onTouchMove(x, y)
                 invalidate()
             }
             is TouchEvent.ActionUp -> {
                 touchingUp = true
+                clearingCanvas = false
                 onTouchUp()
+                invalidate()
+            }
+            is TouchEvent.Clear -> {
+                touchingUp = false
+                clearingCanvas = true
                 invalidate()
             }
         }

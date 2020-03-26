@@ -8,6 +8,7 @@ object TouchEventType {
     const val ActionDown = "actionDown"
     const val ActionMove = "actionMove"
     const val ActionUp = "actionUp"
+    const val Clear = "clear"
 }
 
 class TouchEventAdapter : JsonSerializer<TouchEvent>, JsonDeserializer<TouchEvent> {
@@ -18,6 +19,7 @@ class TouchEventAdapter : JsonSerializer<TouchEvent>, JsonDeserializer<TouchEven
             TouchEventType.ActionDown -> context.serialize(src, TouchEventType.ActionDown::class.java)
             TouchEventType.ActionMove -> context.serialize(src, TouchEventType.ActionMove::class.java)
             TouchEventType.ActionUp -> context.serialize(src, TouchEventType.ActionUp::class.java)
+            TouchEventType.Clear -> context.serialize(src, TouchEventType.Clear::class.java)
             else -> error("unknown TouchEventType $src")
         }
 
@@ -33,6 +35,7 @@ class TouchEventAdapter : JsonSerializer<TouchEvent>, JsonDeserializer<TouchEven
                     TouchEventType.ActionDown -> context.deserialize(json, TouchEvent.ActionDown::class.java)
                     TouchEventType.ActionMove -> context.deserialize(json, TouchEvent.ActionMove::class.java)
                     TouchEventType.ActionUp -> TouchEvent.ActionUp()
+                    TouchEventType.Clear -> TouchEvent.Clear()
                     else -> TouchEvent.None()
                 }
             }

@@ -3,7 +3,6 @@ package me.amryousef.webrtc_demo
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
@@ -74,6 +73,8 @@ class MainActivity : AppCompatActivity() {
             drawOnScreen.setOnClickListener {
                 changeControlsVisibility(GONE)
                 closeEdition.visibility = VISIBLE
+                clearDrawing.visibility = VISIBLE
+                clearDrawing.setOnClickListener { editionController.clear() }
                 editionController.startEditing()
                 videoContainerView.setOnTouchListener(editionController)
             }
@@ -81,6 +82,7 @@ class MainActivity : AppCompatActivity() {
                 videoContainerView.setOnTouchListener(null)
                 editionController.stopEditing()
                 closeEdition.visibility = GONE
+                clearDrawing.visibility = GONE
                 changeControlsVisibility(VISIBLE)
             }
         } else {
