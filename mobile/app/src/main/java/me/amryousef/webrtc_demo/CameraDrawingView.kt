@@ -9,13 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import org.webrtc.SurfaceViewRenderer
 
-class CameraDrawingView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet
-) : SurfaceViewRenderer(
-    context,
-    attrs
-) {
+class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRenderer(context, attrs) {
 
     var commandToPaint: DrawingCommand = DrawingCommand.None
 
