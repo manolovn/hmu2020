@@ -28,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rtcClient: RTCClient
     private lateinit var signallingClient: SignallingClient
 
+    private lateinit var drawingController: DrawingController
+
     private val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
             super.onCreateSuccess(p0)
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        drawingController = DrawingController(local_view)
         checkCameraPermission()
     }
 
@@ -65,11 +68,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+        drawingController.start()
         rtcClient.initSurfaceView(remote_view)
         rtcClient.initSurfaceView(local_view)
+
         rtcClient.startLocalVideoCapture(local_view, true)
         signallingClient = SignallingClient(createSignallingClientListener())
-        call_button.setOnClickListener { rtcClient.call(sdpObserver) }
+        call_button.setOnClickListener {
+            rtcClient.call(sdpObserver)
+            drawingController.submitCommand()
+        }
         switch_camera_button.setOnClickListener {
             rtcClient.switchCamera()
         }
@@ -134,6 +142,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         signallingClient.destroy()
+        drawingController.stop()
         super.onDestroy()
     }
 }
