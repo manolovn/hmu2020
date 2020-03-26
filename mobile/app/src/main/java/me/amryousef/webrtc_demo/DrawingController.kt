@@ -1,56 +1,44 @@
 package me.amryousef.webrtc_demo
 
+import android.graphics.Path
 import android.util.Log
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.subjects.PublishSubject
-import io.reactivex.rxjava3.functions.BiFunction as BiFunction1
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 sealed class DrawingCommand {
     object None : DrawingCommand()
-    data class Line(val startX: Float, val startY: Float, val endX: Float, val endY: Float) : DrawingCommand()
+    data class TouchedUpContent(val path: Path, val circlePath: Path): DrawingCommand()
+    data class Content(val path: Path, val circlePath: Path) : DrawingCommand()
     object Clear : DrawingCommand()
 }
 
 class DrawingController(private val drawingView: CameraDrawingView) {
 
-    private var drawingSubscription = Disposable.empty()
-
-    private val canDrawSubject = PublishSubject.create<Boolean>()
-    private val drawingCommands = PublishSubject.create<DrawingCommand>()
-
-    private val canDrawStream = canDrawSubject.startWithItem(true)
-    private val drawingCommandsStream = drawingCommands.startWithItem(DrawingCommand.None)
+    private val drawingSubscriptions = CompositeDisposable()
 
     fun start() {
-        Observable.combineLatest(
-            canDrawStream,
-            drawingCommandsStream,
-            BiFunction1<Boolean, DrawingCommand, DrawingCommand> { canDraw, drawingCommand ->
-                if (canDraw) {
-                    drawingCommand
-                } else {
-                    DrawingCommand.None
-                }
-            })
-            .retry()
-            .distinctUntilChanged()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(::onDrawCommand) { Log.e("ERROR", "something unexpected ${it.message}") }
-            .also { drawingSubscription = it }
     }
 
     fun stop() {
-        drawingSubscription.dispose()
+        drawingSubscriptions.clear()
     }
 
-    fun submitCommand() {
-        drawingCommands.onNext(DrawingCommand.Clear)
+    fun bindDrawingCommands(stream: Observable<DrawingCommand>) {
+        stream
+            .retry()
+            .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(::onDrawCommand, ::logError)
+            .also { drawingSubscriptions.add(it) }
     }
 
     private fun onDrawCommand(drawCommand: DrawingCommand) {
         drawingView.commandToPaint = drawCommand
         drawingView.invalidate()
+    }
+
+    private fun logError(throwable: Throwable) {
+        Log.e("ERROR", "something unexpected $throwable")
     }
 }

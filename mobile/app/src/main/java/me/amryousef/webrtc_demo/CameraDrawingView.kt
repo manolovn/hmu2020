@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.View
 import org.webrtc.SurfaceViewRenderer
@@ -13,23 +12,45 @@ class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRend
 
     var commandToPaint: DrawingCommand = DrawingCommand.None
 
+    private val paint = Paint().apply {
+        isAntiAlias = true
+        isDither = true
+        color = Color.GREEN
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 12F
+    }
+
+    private val circlePaint = Paint().apply {
+        isAntiAlias = true
+        color = Color.BLUE
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.MITER
+        strokeWidth = 4f
+    }
+
     init {
         setWillNotDraw(false)
         visibility = View.VISIBLE
     }
 
-    private val paintLine = Paint().apply {
-        isAntiAlias = true
-        color = Color.RED
-        strokeWidth = 5F
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        when (commandToPaint) {
-            DrawingCommand.None -> Unit
-            is DrawingCommand.Line -> canvas.drawLine(50F, 50f, 300f, 300F, paintLine)
-            DrawingCommand.Clear -> canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        with(commandToPaint) {
+            when (this) {
+                is DrawingCommand.TouchedUpContent -> {
+                    circlePath.reset()
+                    canvas.drawPath(path, paint)
+                    path.reset()
+                    canvas.drawPath(path, paint)
+                    canvas.drawPath(circlePath, circlePaint)
+                }
+                is DrawingCommand.Content -> {
+                    canvas.drawPath(path, paint)
+                    canvas.drawPath(circlePath, circlePaint)
+                }
+            }
         }
     }
 }

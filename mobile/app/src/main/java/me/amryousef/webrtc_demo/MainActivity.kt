@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var signallingClient: SignallingClient
 
     private lateinit var drawingController: DrawingController
+    private lateinit var editionController: EditionController
 
     private val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
@@ -42,8 +43,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         drawingController = DrawingController(local_view)
+        editionController = EditionController(drawingController)
         if (BuildConfig.IS_ADMIN) {
             drawOnScreen.visibility = View.VISIBLE
+            drawOnScreen.setOnClickListener {
+                if (editionController.isEditing) {
+                    videoContainerView.setOnTouchListener(null)
+                    editionController.stopEditing()
+                } else {
+                    editionController.startEditing()
+                    videoContainerView.setOnTouchListener(editionController)
+                }
+            }
         }
         checkCameraPermission()
     }
@@ -80,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         signallingClient = SignallingClient(createSignallingClientListener())
         videoOff.setOnClickListener {
             rtcClient.call(sdpObserver)
-            drawingController.submitCommand()
         }
         switchCamera.setOnClickListener {
             rtcClient.switchCamera()
