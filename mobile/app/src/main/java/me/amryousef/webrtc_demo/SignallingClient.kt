@@ -29,8 +29,8 @@ class SignallingClient(
     private val listener: SignallingClientListener
 ) : CoroutineScope {
 
-    companion object {
-        private const val HOST_ADDRESS = "hmu2020.herokuapp.com"
+    private companion object {
+        const val HOST_ADDRESS = "hmu2020.herokuapp.com"
     }
 
     private val job = Job()
@@ -53,20 +53,20 @@ class SignallingClient(
     }
 
     private fun connect() = launch {
-        client.ws(host = HOST_ADDRESS, port = 8080, path = "/connect") {
+        client.ws(host = HOST_ADDRESS, port = 80, path = "/connect") {
+            Log.d("SignallingClient", "connected!")
             listener.onConnectionEstablished()
             val sendData = sendChannel.openSubscription()
             try {
                 while (true) {
-
                     sendData.poll()?.let {
-                        Log.v(this@SignallingClient.javaClass.simpleName, "Sending: $it")
+                        Log.d("SignallingClient", "Sending: $it")
                         outgoing.send(Frame.Text(it))
                     }
                     incoming.poll()?.let { frame ->
                         if (frame is Frame.Text) {
                             val data = frame.readText()
-                            Log.v(this@SignallingClient.javaClass.simpleName, "Received: $data")
+                            Log.d("SignallingClient", "Received: $data")
                             val jsonObject = gson.fromJson(data, JsonObject::class.java)
                             withContext(Dispatchers.Main) {
                                 if (jsonObject.has("serverUrl")) {
@@ -81,7 +81,7 @@ class SignallingClient(
                     }
                 }
             } catch (exception: Throwable) {
-                Log.e("asd","asd",exception)
+                Log.e("SignallingClient","Failed due to exception: ",exception)
             }
         }
     }

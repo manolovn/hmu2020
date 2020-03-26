@@ -85,6 +85,8 @@ class RTCClient(
     private fun PeerConnection.call(sdpObserver: SdpObserver) {
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"))
         }
 
         createOffer(object : SdpObserver by sdpObserver {
@@ -111,6 +113,8 @@ class RTCClient(
     private fun PeerConnection.answer(sdpObserver: SdpObserver) {
         val constraints = MediaConstraints().apply {
             mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"))
+            mandatory.add(MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"))
         }
 
         createAnswer(object : SdpObserver by sdpObserver {
