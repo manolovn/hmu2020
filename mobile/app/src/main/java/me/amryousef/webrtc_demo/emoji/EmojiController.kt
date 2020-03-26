@@ -15,7 +15,8 @@ class EmojiController(private val signallingClient: SignallingClient) {
         Emoji(1, "fingerup", R.drawable.emoji_fingerup) { signallingClient.sendEmoji(it) },
         Emoji(2, "happy", R.drawable.emoji_happy) { signallingClient.sendEmoji(it) },
         Emoji(3, "meh", R.drawable.emoji_meh) { signallingClient.sendEmoji(it) },
-        Emoji(4, "sad", R.drawable.emoji_sad) { signallingClient.sendEmoji(it) }
+        Emoji(4, "sad", R.drawable.emoji_sad) { signallingClient.sendEmoji(it) },
+        Emoji(5, "batidab", R.drawable.batiburrillo_dabbing_64) { signallingClient.sendEmoji(it) }
     )
 
     fun start() {
