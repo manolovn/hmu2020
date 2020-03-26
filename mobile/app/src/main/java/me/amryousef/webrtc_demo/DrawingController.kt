@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.functions.BiFunction as BiFunction1
 
 sealed class DrawingCommand {
     object None : DrawingCommand()
-    object Line : DrawingCommand()
+    data class Line(val startX: Float, val startY: Float, val endX: Float, val endY: Float) : DrawingCommand()
     object Clear : DrawingCommand()
 }
 
@@ -21,7 +21,7 @@ class DrawingController(private val drawingView: CameraDrawingView) {
     private val drawingCommands = PublishSubject.create<DrawingCommand>()
 
     private val canDrawStream = canDrawSubject.startWithItem(true)
-    private val drawingCommandsStream = drawingCommands.startWithItem(DrawingCommand.Line)
+    private val drawingCommandsStream = drawingCommands.startWithItem(DrawingCommand.None)
 
     fun start() {
         Observable.combineLatest(

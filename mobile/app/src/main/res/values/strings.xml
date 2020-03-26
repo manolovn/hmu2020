@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">webrtc-demo</string>
+    <string name="video_call">Video llamada</string>
 </resources>
