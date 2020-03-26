@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeControlsVisibility(visibility: Int) {
-        if (!remoteViewLoaded) {
+        if (!BuildConfig.IS_ADMIN && !remoteViewLoaded) {
             remote_view_loading.visibility = visibility
         }
         if (showingEmojiList) {
@@ -170,8 +170,10 @@ class MainActivity : AppCompatActivity() {
         rtcClient.initSurfaceView(local_view)
 
         if (BuildConfig.IS_ADMIN) {
+            local_view_loading.visibility = VISIBLE
             rtcClient.startLocalVideoCapture(remote_view)
         } else {
+            remote_view_loading.visibility = VISIBLE
             rtcClient.startLocalVideoCapture(local_view)
         }
 
@@ -216,13 +218,22 @@ class MainActivity : AppCompatActivity() {
         override fun onOfferReceived(description: SessionDescription) {
             rtcClient.onRemoteSessionReceived(description)
             rtcClient.answer(sdpObserver)
-            remote_view_loading.isGone = true
+            if (BuildConfig.IS_ADMIN) {
+                local_view_loading.isGone = true
+            } else {
+                remote_view_loading.isGone = true
+            }
             remoteViewLoaded = true
         }
 
         override fun onAnswerReceived(description: SessionDescription) {
             rtcClient.onRemoteSessionReceived(description)
-            remote_view_loading.isGone = true
+            if (BuildConfig.IS_ADMIN) {
+                local_view_loading.isGone = true
+            } else {
+                remote_view_loading.isGone = true
+            }
+            remoteViewLoaded = true
         }
 
         override fun onIceCandidateReceived(iceCandidate: IceCandidate) {

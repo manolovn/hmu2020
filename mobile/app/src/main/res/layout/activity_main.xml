@@ -17,30 +17,40 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+    <ProgressBar
+            android:id="@+id/local_view_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
             android:id="@+id/closeEdition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_actions_list_selector"
+            android:src="@drawable/ic_baseline_close_24"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/topElementsContainer"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="@drawable/bg_actions_list_selector"
-            android:visibility="gone"
-            android:src="@drawable/ic_baseline_close_24"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
     <ImageView
             android:id="@+id/clearDrawing"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            tools:ignore="MissingConstraints"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_actions_list_selector"
             android:src="@drawable/ic_baseline_clear_all_24"
-            app:layout_constraintTop_toBottomOf="@id/closeEdition"
             app:layout_constraintEnd_toEndOf="@id/closeEdition"
-            app:layout_constraintStart_toStartOf="@id/closeEdition"/>
+            app:layout_constraintStart_toStartOf="@id/closeEdition"
+            app:layout_constraintTop_toBottomOf="@id/closeEdition"
+            tools:ignore="MissingConstraints" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/topElementsContainer"
@@ -122,13 +132,13 @@
             android:id="@+id/remote_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:animateLayoutChanges="true"
             app:layout_constraintBottom_toTopOf="@id/emojisList"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintDimensionRatio="H,9:16"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/end_call" />
 
     <ProgressBar
@@ -136,18 +146,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminate="true"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/remote_view"
             app:layout_constraintEnd_toEndOf="@id/remote_view"
             app:layout_constraintStart_toStartOf="@id/remote_view"
             app:layout_constraintTop_toTopOf="@id/remote_view" />
 
     <ImageView
-        android:id="@+id/emojis_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        app:layout_constraintBottom_toTopOf="@id/emojisList"
-        app:layout_constraintStart_toStartOf="parent" />
+            android:id="@+id/emojis_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            app:layout_constraintBottom_toTopOf="@id/emojisList"
+            app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
             android:id="@+id/end_call"
