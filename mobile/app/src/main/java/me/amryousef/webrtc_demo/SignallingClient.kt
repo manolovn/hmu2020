@@ -75,6 +75,8 @@ class SignallingClient(
                                     listener.onOfferReceived(gson.fromJson(jsonObject, SessionDescription::class.java))
                                 } else if (jsonObject.has("type") && jsonObject.get("type").asString == "ANSWER") {
                                     listener.onAnswerReceived(gson.fromJson(jsonObject, SessionDescription::class.java))
+                                } else if (jsonObject.has("type") && jsonObject.get("type").asString == "EMOJI") {
+                                    listener.onEmojiReceived(jsonObject.get("emojiCode").asInt)
                                 }
                             }
                         }
@@ -94,4 +96,11 @@ class SignallingClient(
         client.close()
         job.complete()
     }
+
+    fun sendEmoji(it: Int) = runBlocking {
+        val emojiObject = EmojiCommand("EMOJI", it)
+        sendChannel.send(gson.toJson(emojiObject))
+    }
 }
+
+data class EmojiCommand(val type: String, val emojiCode: Int)

@@ -1,21 +1,33 @@
 package me.amryousef.webrtc_demo
 
 import android.Manifest
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.WindowManager
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import io.ktor.util.KtorExperimentalAPI
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import me.amryousef.webrtc_demo.emoji.EmojiAdapter
+import me.amryousef.webrtc_demo.emoji.EmojiController
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
+
 
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
@@ -32,6 +44,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var drawingController: DrawingController
 
+    private lateinit var emojiController: EmojiController
+
     private val sdpObserver = object : AppSdpObserver() {
         override fun onCreateSuccess(p0: SessionDescription?) {
             super.onCreateSuccess(p0)
@@ -45,6 +59,14 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         drawingController = DrawingController(local_view)
         checkCameraPermission()
+        setupEmojis()
+    }
+
+    private fun setupEmojis() {
+        emojiController = EmojiController(signallingClient)
+        emojiController.start()
+        emojisList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        emojisList.adapter = EmojiAdapter(emojiController.getEmojis(), this)
     }
 
     private fun checkCameraPermission() {
@@ -85,6 +107,17 @@ class MainActivity : AppCompatActivity() {
         switchCamera.setOnClickListener {
             rtcClient.switchCamera()
         }
+        sendEmojiButton.setOnClickListener {
+            showEmojisPanel()
+        }
+    }
+
+    private fun showEmojisPanel() {
+        if (emojisList.visibility == VISIBLE) {
+            emojisList.visibility = GONE
+        } else {
+            emojisList.visibility = VISIBLE
+        }
     }
 
     private fun createSignallingClientListener() = object : SignallingClientListener {
@@ -106,6 +139,28 @@ class MainActivity : AppCompatActivity() {
         override fun onIceCandidateReceived(iceCandidate: IceCandidate) {
             rtcClient.addIceCandidate(iceCandidate)
         }
+
+        override fun onEmojiReceived(emojiCode: Int) {
+            emojis_view.setImageResource(emojiController.getEmojiById(emojiCode).image)
+            val deltaY: Float = emojis_view.bottom + 3F
+            val anim = ObjectAnimator.ofFloat(emojis_view, "translationY", emojis_view.bottom.toFloat(), deltaY)
+            anim.duration = 500
+            anim.interpolator = AccelerateDecelerateInterpolator()
+            val fadeAnim = ObjectAnimator.ofFloat(emojis_view, "alpha", 0f, 1f)
+            anim.duration = 350
+            val animatorSet = AnimatorSet()
+            //animatorSet.play(anim)
+            animatorSet.play(fadeAnim)
+            animatorSet.start()
+            object:CountDownTimer(1500, 1000) {
+                override fun onFinish() {
+                    emojis_view.setImageResource(0)
+                }
+                override fun onTick(millisUntilFinished: Long) {
+
+                }
+            }.start()
+        }
     }
 
     private fun requestCameraPermission(dialogShown: Boolean = false) {
@@ -120,8 +175,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun showPermissionRationaleDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Camera Permission Required")
-            .setMessage("This app need the camera to function")
+            .setTitle("Permissions Required")
+            .setMessage("This app need the camera and mic to function")
             .setPositiveButton("Grant") { dialog, _ ->
                 dialog.dismiss()
                 requestCameraPermission(true)
