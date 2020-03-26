@@ -147,7 +147,11 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onAddStream(p0: MediaStream?) {
                     super.onAddStream(p0)
-                    p0?.videoTracks?.get(0)?.addSink(remote_view)
+                    if (BuildConfig.IS_ADMIN) {
+                        p0?.videoTracks?.get(0)?.addSink(local_view)
+                    } else {
+                        p0?.videoTracks?.get(0)?.addSink(remote_view)
+                    }
                 }
             }
         )
@@ -155,7 +159,12 @@ class MainActivity : AppCompatActivity() {
         rtcClient.initSurfaceView(remote_view)
         rtcClient.initSurfaceView(local_view)
 
-        rtcClient.startLocalVideoCapture(local_view)
+        if (BuildConfig.IS_ADMIN) {
+            rtcClient.startLocalVideoCapture(remote_view)
+        } else {
+            rtcClient.startLocalVideoCapture(local_view)
+        }
+
         signallingClient.start()
         videoOff.setOnClickListener {
             rtcClient.call(sdpObserver)
