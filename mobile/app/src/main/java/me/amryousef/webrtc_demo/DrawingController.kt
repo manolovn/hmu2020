@@ -27,6 +27,8 @@ class DrawingController(private val drawingView: CameraDrawingView) {
 
     fun bindDrawingCommands(stream: Observable<TouchEvent>) {
         stream
+            .retry()
+            .distinctUntilChanged()
             .subscribe(::onTouchEvent, ::logError)
             .also { drawingSubscriptions.add(it) }
     }
