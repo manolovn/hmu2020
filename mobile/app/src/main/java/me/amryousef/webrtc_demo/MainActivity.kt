@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val CAMERA_PERMISSION_REQUEST_CODE = 1
         private const val CAMERA_PERMISSION = Manifest.permission.CAMERA
+        private const val AUDIO_RECORD_PERMISSION = Manifest.permission.RECORD_AUDIO
     }
 
     private lateinit var rtcClient: RTCClient
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         drawingController = DrawingController(local_view)
         editionController = EditionController(drawingController)
         if (BuildConfig.IS_ADMIN) {
@@ -60,7 +63,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(this, AUDIO_RECORD_PERMISSION) != PackageManager.PERMISSION_GRANTED ) {
             requestCameraPermission()
         } else {
             onCameraPermissionGranted()
@@ -122,7 +126,9 @@ class MainActivity : AppCompatActivity() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, CAMERA_PERMISSION) && !dialogShown) {
             showPermissionRationaleDialog()
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(CAMERA_PERMISSION), CAMERA_PERMISSION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(this, arrayOf(
+                CAMERA_PERMISSION, AUDIO_RECORD_PERMISSION
+            ), CAMERA_PERMISSION_REQUEST_CODE)
         }
     }
 
