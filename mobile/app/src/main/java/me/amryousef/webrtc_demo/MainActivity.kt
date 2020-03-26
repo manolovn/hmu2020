@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         rtcClient.initSurfaceView(remote_view)
         rtcClient.initSurfaceView(local_view)
 
-        rtcClient.startLocalVideoCapture(local_view, true)
+        rtcClient.startLocalVideoCapture(local_view)
         signallingClient = SignallingClient(createSignallingClientListener())
         call_button.setOnClickListener {
             rtcClient.call(sdpObserver)

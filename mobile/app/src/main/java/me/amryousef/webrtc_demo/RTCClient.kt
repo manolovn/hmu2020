@@ -16,7 +16,6 @@ class RTCClient(
     }
 
     private val rootEglBase: EglBase = EglBase.create()
-    var useFrontCamera = true
 
     init {
         initPeerConnectionFactory(context)
@@ -60,11 +59,7 @@ class RTCClient(
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
             deviceNames.find {
-                if (useFrontCamera) {
-                    isFrontFacing(it)
-                } else {
-                    isBackFacing(it)
-                }
+                isFrontFacing(it)
             }?.let {
                 createCapturer(it, null)
             } ?: throw IllegalStateException()
@@ -76,8 +71,7 @@ class RTCClient(
         init(rootEglBase.eglBaseContext, null)
     }
 
-    fun startLocalVideoCapture(localVideoOutput: SurfaceViewRenderer, isFrontCamera: Boolean) {
-        this.useFrontCamera = isFrontCamera
+    fun startLocalVideoCapture(localVideoOutput: SurfaceViewRenderer) {
         val surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
         (videoCapturer as VideoCapturer).initialize(surfaceTextureHelper, localVideoOutput.context, localVideoSource.capturerObserver)
         videoCapturer.startCapture(320, 240, 60)
