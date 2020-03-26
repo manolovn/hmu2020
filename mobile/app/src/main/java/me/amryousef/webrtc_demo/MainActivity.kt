@@ -113,8 +113,7 @@ class MainActivity : AppCompatActivity() {
             if (showingEmojiList) {
                 emojisList.visibility = visibility
             }
-            val rightTopCornerControl = if (BuildConfig.IS_ADMIN) drawOnScreen else flashlight
-            val controlsToHide = arrayOf(screen_title, rightTopCornerControl, remote_view, mainActions)
+            val controlsToHide = arrayOf(topElementsContainer, remote_view, mainActions, end_call)
             controlsToHide.forEach { it.visibility = visibility }
         }
     }
