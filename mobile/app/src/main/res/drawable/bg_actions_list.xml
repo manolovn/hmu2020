@@ -11,6 +11,6 @@
         android:color="@android:color/transparent"
         android:width="2dp"/>
     <solid
-        android:color="#33000000"/>
+        android:color="@android:color/transparent"/>
     <corners android:radius="6dp" />
 </shape>

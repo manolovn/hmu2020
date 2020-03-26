@@ -6,7 +6,7 @@
 
     <ImageView
         android:id="@+id/emojiImage"
-        android:background="@drawable/bg_emojis_list"
+        android:background="@drawable/bg_emojis_list_selector"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:src="@drawable/emoji_hearth" />

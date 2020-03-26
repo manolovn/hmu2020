@@ -20,6 +20,7 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.ktor.util.KtorExperimentalAPI
+import kotlinx.android.synthetic.main.actions.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import me.amryousef.webrtc_demo.emoji.EmojiAdapter
@@ -127,8 +128,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showEmojisPanel() {
         if (emojisList.visibility == VISIBLE) {
+            emojisList.isSelected = false
             emojisList.visibility = GONE
         } else {
+            emojisList.isSelected = true
             emojisList.visibility = VISIBLE
         }
     }
