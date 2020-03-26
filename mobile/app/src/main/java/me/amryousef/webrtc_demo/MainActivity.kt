@@ -1,20 +1,15 @@
 package me.amryousef.webrtc_demo
 
 import android.Manifest
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +29,7 @@ import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
 import kotlinx.android.synthetic.main.activity_main.actions as mainActions
+
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 class MainActivity : AppCompatActivity() {
@@ -75,13 +71,16 @@ class MainActivity : AppCompatActivity() {
             drawOnScreen.visibility = VISIBLE
             flashlight.visibility = GONE
             drawOnScreen.setOnClickListener {
-                if (editionController.isEditing) {
-                    videoContainerView.setOnTouchListener(null)
-                    editionController.stopEditing()
-                } else {
-                    editionController.startEditing()
-                    videoContainerView.setOnTouchListener(editionController)
-                }
+                changeControlsVisibility(GONE)
+                closeEdition.visibility = VISIBLE
+                editionController.startEditing()
+                videoContainerView.setOnTouchListener(editionController)
+            }
+            closeEdition.setOnClickListener {
+                videoContainerView.setOnTouchListener(null)
+                editionController.stopEditing()
+                closeEdition.visibility = GONE
+                changeControlsVisibility(VISIBLE)
             }
         } else {
             flashlight.visibility = VISIBLE
@@ -100,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         }
         checkCameraPermission()
         setupEmojis()
-        mute.setOnClickListener {  }
+        mute.setOnClickListener { }
     }
 
     private fun setUpShowHideControls() {
@@ -108,15 +107,19 @@ class MainActivity : AppCompatActivity() {
         videoContainerView.setOnClickListener {
             val visibility = if (controlsShown) GONE else VISIBLE
             controlsShown = !controlsShown
-            if (!remoteViewLoaded) {
-                remote_view_loading.visibility = visibility
-            }
-            if (showingEmojiList) {
-                emojisList.visibility = visibility
-            }
-            val controlsToHide = arrayOf(topElementsContainer, remote_view, mainActions, end_call)
-            controlsToHide.forEach { it.visibility = visibility }
+            changeControlsVisibility(visibility)
         }
+    }
+
+    private fun changeControlsVisibility(visibility: Int) {
+        if (!remoteViewLoaded) {
+            remote_view_loading.visibility = visibility
+        }
+        if (showingEmojiList) {
+            emojisList.visibility = visibility
+        }
+        val controlsToHide = arrayOf(topElementsContainer, remote_view, mainActions, end_call)
+        controlsToHide.forEach { it.visibility = visibility }
     }
 
     private fun setupEmojis() {
