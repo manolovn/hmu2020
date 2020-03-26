@@ -1,6 +1,6 @@
 *.iml
 .gradle
-/local.properties
+**/local.properties
 /.idea
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
