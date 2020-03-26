@@ -3,7 +3,6 @@ package me.amryousef.webrtc_demo
 import android.Manifest
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraAccessException
@@ -23,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.plattysoft.leonids.ParticleSystem
 import io.ktor.util.KtorExperimentalAPI
 import kotlinx.android.synthetic.main.actions.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -187,7 +187,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onEmojiReceived(emojiCode: Int) {
-            emojis_view.setImageResource(emojiController.getEmojiById(emojiCode).image)
+            ParticleSystem(this@MainActivity, 24, emojiController.getEmojiById(emojiCode).image, 1500L)
+                .setSpeedRange(0.2f, 0.5f)
+                .oneShot(emojis_view, 6)
+
+            /*emojis_view.setImageResource(emojiController.getEmojiById(emojiCode).image)
             val deltaY: Float = emojis_view.bottom + 3F
             val anim = ObjectAnimator.ofFloat(emojis_view, "translationY", emojis_view.bottom.toFloat(), deltaY)
             anim.duration = 500
@@ -205,7 +209,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onTick(millisUntilFinished: Long) {
 
                 }
-            }.start()
+            }.start()*/
         }
 
         override fun onEndCallReceived() {
