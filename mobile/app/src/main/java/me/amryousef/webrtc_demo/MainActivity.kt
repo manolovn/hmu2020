@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             rtcClient.call(sdpObserver)
             drawingController.submitCommand()
         }
-        switch_camera_button.setOnClickListener {
+        switchCamera.setOnClickListener {
             rtcClient.switchCamera()
         }
     }

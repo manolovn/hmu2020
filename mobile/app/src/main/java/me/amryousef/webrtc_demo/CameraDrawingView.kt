@@ -28,7 +28,7 @@ class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRend
         super.onDraw(canvas)
         when (commandToPaint) {
             DrawingCommand.None -> Unit
-            DrawingCommand.Line -> canvas.drawLine(50F, 50f, 300f, 300F, paintLine)
+            is DrawingCommand.Line -> canvas.drawLine(50F, 50f, 300f, 300F, paintLine)
             DrawingCommand.Clear -> canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         }
     }
