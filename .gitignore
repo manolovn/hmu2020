@@ -12,6 +12,7 @@ mobile/local.properties
 .cxx
 /.idea/
 
+mobile/local.properties
 mobile/\.idea/caches/
 
 mobile/\.idea/libraries/

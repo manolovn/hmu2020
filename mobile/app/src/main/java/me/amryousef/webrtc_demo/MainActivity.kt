@@ -74,18 +74,18 @@ class MainActivity : AppCompatActivity() {
 
         rtcClient.startLocalVideoCapture(local_view)
         signallingClient = SignallingClient(createSignallingClientListener())
-        call_button.setOnClickListener {
+        videoOff.setOnClickListener {
             rtcClient.call(sdpObserver)
             drawingController.submitCommand()
         }
-        switch_camera_button.setOnClickListener {
+        switchCamera.setOnClickListener {
             rtcClient.switchCamera()
         }
     }
 
     private fun createSignallingClientListener() = object : SignallingClientListener {
         override fun onConnectionEstablished() {
-            call_button.isClickable = true
+            videoOff.isClickable = true
         }
 
         override fun onOfferReceived(description: SessionDescription) {

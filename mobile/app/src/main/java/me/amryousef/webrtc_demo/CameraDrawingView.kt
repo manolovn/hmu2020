@@ -9,13 +9,7 @@ import android.util.AttributeSet
 import android.view.View
 import org.webrtc.SurfaceViewRenderer
 
-class CameraDrawingView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet
-) : SurfaceViewRenderer(
-    context,
-    attrs
-) {
+class CameraDrawingView(context: Context, attrs: AttributeSet) : SurfaceViewRenderer(context, attrs) {
 
     var commandToPaint: DrawingCommand = DrawingCommand.None
 
@@ -34,7 +28,7 @@ class CameraDrawingView @JvmOverloads constructor(
         super.onDraw(canvas)
         when (commandToPaint) {
             DrawingCommand.None -> Unit
-            DrawingCommand.Line -> canvas.drawLine(50F, 50f, 300f, 300F, paintLine)
+            is DrawingCommand.Line -> canvas.drawLine(50F, 50f, 300f, 300F, paintLine)
             DrawingCommand.Clear -> canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         }
     }
