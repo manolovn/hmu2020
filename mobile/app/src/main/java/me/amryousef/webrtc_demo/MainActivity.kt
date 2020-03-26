@@ -3,10 +3,12 @@ package me.amryousef.webrtc_demo
 import android.Manifest
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -32,7 +34,6 @@ import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
 import kotlinx.android.synthetic.main.activity_main.actions as mainActions
-
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 class MainActivity : AppCompatActivity() {
@@ -165,6 +166,15 @@ class MainActivity : AppCompatActivity() {
         sendEmojiButton.setOnClickListener {
             showEmojisPanel()
         }
+        end_call.setOnClickListener {
+            signallingClient.endCall()
+            finish()
+        }
+        pipButton.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                enterPictureInPictureMode()
+            }
+        }
     }
 
     private fun showEmojisPanel() {
@@ -221,6 +231,10 @@ class MainActivity : AppCompatActivity() {
 
                 }
             }.start()
+        }
+
+        override fun onEndCallReceived() {
+            finish()
         }
     }
 

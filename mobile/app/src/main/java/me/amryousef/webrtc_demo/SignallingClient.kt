@@ -18,6 +18,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
+import me.amryousef.webrtc_demo.emoji.EmojiCommand
+import me.amryousef.webrtc_demo.endcall.END_CALL_COMMAND_ID
+import me.amryousef.webrtc_demo.endcall.EndCallCommand
 
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
@@ -77,6 +80,8 @@ class SignallingClient(
                                     listener.onAnswerReceived(gson.fromJson(jsonObject, SessionDescription::class.java))
                                 } else if (jsonObject.has("type") && jsonObject.get("type").asString == "EMOJI") {
                                     listener.onEmojiReceived(jsonObject.get("emojiCode").asInt)
+                                } else if (jsonObject.has("type") && jsonObject.get("type").asString == END_CALL_COMMAND_ID) {
+                                    listener.onEndCallReceived()
                                 } else {
                                     try {
                                         val touchEvent = gson.fromJson(data, TouchEvent::class.java)
@@ -119,6 +124,8 @@ class SignallingClient(
         val emojiObject = EmojiCommand("EMOJI", it)
         sendChannel.send(gson.toJson(emojiObject))
     }
-}
 
-data class EmojiCommand(val type: String, val emojiCode: Int)
+    fun endCall() = runBlocking {
+        sendChannel.send(gson.toJson(EndCallCommand()))
+    }
+}

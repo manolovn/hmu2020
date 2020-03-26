@@ -24,6 +24,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+                android:id="@+id/pipButton"
+                android:background="@drawable/bg_actions_list_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_pip"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible"
+                tools:ignore="ContentDescription" />
         <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/topControlsGuideline"
                 android:layout_width="wrap_content"
@@ -107,6 +120,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/end_call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_call_end_selector"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_call_end"
+        app:layout_constraintBottom_toTopOf="@id/emojisList"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/emojisList"
