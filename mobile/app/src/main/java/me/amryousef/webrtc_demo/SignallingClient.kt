@@ -123,6 +123,7 @@ class SignallingClient(
     fun sendEmoji(it: Int) = runBlocking {
         val emojiObject = EmojiCommand("EMOJI", it)
         sendChannel.send(gson.toJson(emojiObject))
+        listener.onEmojiReceived(it)
     }
 
     fun endCall() = runBlocking {
