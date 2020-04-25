@@ -1,4 +1,4 @@
-package me.amryousef.webrtc_demo.endcall
+package me.amryousef.webrtc_demo.home.endcall
 
 const val END_CALL_COMMAND_ID = "ENDCALL"
 

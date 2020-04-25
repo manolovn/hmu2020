@@ -1,4 +1,4 @@
-package me.amryousef.webrtc_demo
+package me.amryousef.webrtc_demo.data
 
 import android.util.Log
 import com.google.gson.GsonBuilder
@@ -16,11 +16,13 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import me.amryousef.webrtc_demo.home.editor.TouchEvent
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
-import me.amryousef.webrtc_demo.emoji.EmojiCommand
-import me.amryousef.webrtc_demo.endcall.END_CALL_COMMAND_ID
-import me.amryousef.webrtc_demo.endcall.EndCallCommand
+import me.amryousef.webrtc_demo.home.emoji.EmojiCommand
+import me.amryousef.webrtc_demo.home.endcall.END_CALL_COMMAND_ID
+import me.amryousef.webrtc_demo.home.endcall.EndCallCommand
+import me.amryousef.webrtc_demo.shared.TouchEventAdapter
 
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
@@ -35,7 +37,10 @@ class SignallingClient(
     private val job = Job()
 
     private val gson = GsonBuilder().apply {
-        registerTypeAdapter(TouchEvent::class.java, TouchEventAdapter())
+        registerTypeAdapter(
+            TouchEvent::class.java,
+            TouchEventAdapter()
+        )
     }.create()
 
     private val touchEventsPublisher = PublishSubject.create<TouchEvent>()

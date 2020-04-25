@@ -1,4 +1,4 @@
-package me.amryousef.webrtc_demo
+package me.amryousef.webrtc_demo.home
 
 import android.Manifest
 import android.content.Context
@@ -23,9 +23,14 @@ import io.ktor.util.KtorExperimentalAPI
 import kotlinx.android.synthetic.main.actions.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import me.amryousef.webrtc_demo.emoji.Emoji
-import me.amryousef.webrtc_demo.emoji.EmojiAdapter
-import me.amryousef.webrtc_demo.emoji.EmojiController
+import me.amryousef.webrtc_demo.*
+import me.amryousef.webrtc_demo.data.*
+import me.amryousef.webrtc_demo.home.editor.DrawingController
+import me.amryousef.webrtc_demo.home.editor.DrawingEventsDispatcher
+import me.amryousef.webrtc_demo.home.editor.EditionController
+import me.amryousef.webrtc_demo.home.emoji.Emoji
+import me.amryousef.webrtc_demo.home.emoji.EmojiAdapter
+import me.amryousef.webrtc_demo.home.emoji.EmojiController
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.SessionDescription
@@ -34,7 +39,7 @@ import kotlinx.android.synthetic.main.activity_main.actions as mainActions
 
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
-class MainActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
     companion object {
         private const val CAMERA_PERMISSION_REQUEST_CODE = 1
@@ -43,7 +48,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var rtcClient: RTCClient
-    private val signallingClient: SignallingClient = SignallingClient(createSignallingClientListener())
+    private val signallingClient: SignallingClient =
+        SignallingClient(
+            createSignallingClientListener()
+        )
 
     private lateinit var drawingController: DrawingController
     private lateinit var editionController: EditionController
@@ -65,10 +73,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        drawingController = DrawingController(local_view)
+        drawingController =
+            DrawingController(local_view)
 
         setUpShowHideControls()
-        editionController = EditionController(drawingController, BuildConfig.IS_ADMIN, DrawingEventsDispatcher(signallingClient))
+        editionController =
+            EditionController(
+                drawingController,
+                BuildConfig.IS_ADMIN,
+                DrawingEventsDispatcher(
+                    signallingClient
+                )
+            )
         if (BuildConfig.IS_ADMIN) {
             drawOnScreen.visibility = VISIBLE
             flashlight.visibility = GONE
@@ -139,8 +155,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) != PackageManager.PERMISSION_GRANTED
-            || ContextCompat.checkSelfPermission(this, AUDIO_RECORD_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,
+                CAMERA_PERMISSION
+            ) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(this,
+                AUDIO_RECORD_PERMISSION
+            ) != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         } else {
             onCameraPermissionGranted()
@@ -212,7 +232,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createSignallingClientListener() = object : SignallingClientListener {
+    private fun createSignallingClientListener() = object :
+        SignallingClientListener {
         override fun onConnectionEstablished() {
             videoOff.isClickable = true
         }
@@ -261,25 +282,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun drawEmojisInCenter(emoji: Emoji) {
-        ParticleSystem(this@MainActivity, 24, emoji.image, 1500L)
+        ParticleSystem(this@HomeActivity, 24, emoji.image, 1500L)
             .setSpeedRange(0.2f, 0.5f)
             .oneShot(emojis_view, 6)
     }
 
     private fun drawEmojisRelative(emoji: Emoji) {
         val c = emojisList.findViewHolderForAdapterPosition(emoji.id)?.itemView
-        ParticleSystem(this@MainActivity, 24, emoji.image, 1500L)
+        ParticleSystem(this@HomeActivity, 24, emoji.image, 1500L)
             .setSpeedRange(0.2f, 0.5f)
             .oneShot(c, 6)
     }
 
     private fun requestCameraPermission(dialogShown: Boolean = false) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, CAMERA_PERMISSION) && !dialogShown) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                CAMERA_PERMISSION
+            ) && !dialogShown) {
             showPermissionRationaleDialog()
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(
-                CAMERA_PERMISSION, AUDIO_RECORD_PERMISSION
-            ), CAMERA_PERMISSION_REQUEST_CODE)
+                CAMERA_PERMISSION,
+                AUDIO_RECORD_PERMISSION
+            ),
+                CAMERA_PERMISSION_REQUEST_CODE
+            )
         }
     }
 

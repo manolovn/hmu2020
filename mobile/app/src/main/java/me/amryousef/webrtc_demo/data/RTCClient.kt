@@ -1,8 +1,7 @@
-package me.amryousef.webrtc_demo
+package me.amryousef.webrtc_demo.data
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import org.webrtc.*
 
 class RTCClient(
@@ -10,10 +9,10 @@ class RTCClient(
     observer: PeerConnection.Observer
 ) {
 
-    companion object {
-        private const val LOCAL_TRACK_ID = "local_track"
-        private const val LOCAL_AUDIO_TRACK_ID = "local_audio_track"
-        private const val LOCAL_STREAM_ID = "local_track"
+    private companion object {
+        const val LOCAL_TRACK_ID = "local_track"
+        const val LOCAL_AUDIO_TRACK_ID = "local_audio_track"
+        const val LOCAL_STREAM_ID = "local_track"
     }
 
     private val rootEglBase: EglBase = EglBase.create()
@@ -45,7 +44,13 @@ class RTCClient(
         return PeerConnectionFactory
             .builder()
             .setVideoDecoderFactory(DefaultVideoDecoderFactory(rootEglBase.eglBaseContext))
-            .setVideoEncoderFactory(DefaultVideoEncoderFactory(rootEglBase.eglBaseContext, true, true))
+            .setVideoEncoderFactory(
+                DefaultVideoEncoderFactory(
+                    rootEglBase.eglBaseContext,
+                    true,
+                    true
+                )
+            )
             .setOptions(PeerConnectionFactory.Options().apply {
                 disableEncryption = true
                 disableNetworkMonitor = true
@@ -53,10 +58,11 @@ class RTCClient(
             .createPeerConnectionFactory()
     }
 
-    private fun buildPeerConnection(observer: PeerConnection.Observer) = peerConnectionFactory.createPeerConnection(
-        iceServer,
-        observer
-    )
+    private fun buildPeerConnection(observer: PeerConnection.Observer) =
+        peerConnectionFactory.createPeerConnection(
+            iceServer,
+            observer
+        )
 
     private fun getVideoCapturer(context: Context) =
         Camera2Enumerator(context).run {
@@ -74,12 +80,19 @@ class RTCClient(
     }
 
     fun startLocalVideoCapture(localVideoOutput: SurfaceViewRenderer) {
-        val surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
-        (videoCapturer as VideoCapturer).initialize(surfaceTextureHelper, localVideoOutput.context, localVideoSource.capturerObserver)
+        val surfaceTextureHelper =
+            SurfaceTextureHelper.create(Thread.currentThread().name, rootEglBase.eglBaseContext)
+        (videoCapturer as VideoCapturer).initialize(
+            surfaceTextureHelper,
+            localVideoOutput.context,
+            localVideoSource.capturerObserver
+        )
         videoCapturer.startCapture(320, 240, 60)
-        val localVideoTrack = peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
+        val localVideoTrack =
+            peerConnectionFactory.createVideoTrack(LOCAL_TRACK_ID, localVideoSource)
         localVideoTrack.addSink(localVideoOutput)
-        val localAudioTrack = peerConnectionFactory.createAudioTrack(LOCAL_AUDIO_TRACK_ID, localAudioSource)
+        val localAudioTrack =
+            peerConnectionFactory.createAudioTrack(LOCAL_AUDIO_TRACK_ID, localAudioSource)
         localAudioTrack.setEnabled(true)
         val localStream = peerConnectionFactory.createLocalMediaStream(LOCAL_STREAM_ID)
         localStream.addTrack(localVideoTrack)
@@ -167,13 +180,11 @@ class RTCClient(
     }
 
     fun switchCamera() {
-        videoCapturer.switchCamera(object: CameraVideoCapturer.CameraSwitchHandler {
+        videoCapturer.switchCamera(object : CameraVideoCapturer.CameraSwitchHandler {
             override fun onCameraSwitchDone(p0: Boolean) {
-                Log.d("xxx", "yuju")
             }
 
             override fun onCameraSwitchError(p0: String?) {
-                Log.d("xxx", "fuck")
             }
         })
     }

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -59,6 +60,11 @@ dependencies {
 
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
+
+    implementation 'com.google.dagger:dagger:2.21'
+    kapt 'com.google.dagger:dagger-compiler:2.21'
+    compileOnly 'com.squareup.inject:assisted-inject-annotations-dagger2:0.3.3'
+    kapt 'com.squareup.inject:assisted-inject-processor-dagger2:0.3.3'
 
     //WebRTC dependency
     implementation("org.webrtc:google-webrtc:$webrtc_version")

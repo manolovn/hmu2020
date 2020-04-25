@@ -2,6 +2,8 @@ package me.amryousef.webrtc_demo
 
 import com.google.gson.GsonBuilder
 import junit.framework.TestCase.assertEquals
+import me.amryousef.webrtc_demo.home.editor.TouchEvent
+import me.amryousef.webrtc_demo.shared.TouchEventAdapter
 import org.junit.Test
 
 /**
@@ -12,7 +14,10 @@ import org.junit.Test
 class TouchEventSerialization {
 
     private val gson = GsonBuilder().apply {
-        registerTypeAdapter(TouchEvent::class.java, TouchEventAdapter())
+        registerTypeAdapter(
+            TouchEvent::class.java,
+            TouchEventAdapter()
+        )
     }.create()
 
     @Test

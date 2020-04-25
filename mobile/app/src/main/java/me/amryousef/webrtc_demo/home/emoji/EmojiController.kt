@@ -1,10 +1,10 @@
-package me.amryousef.webrtc_demo.emoji
+package me.amryousef.webrtc_demo.home.emoji
 
 import androidx.annotation.DrawableRes
 import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import me.amryousef.webrtc_demo.R
-import me.amryousef.webrtc_demo.SignallingClient
+import me.amryousef.webrtc_demo.data.SignallingClient
 
 @KtorExperimentalAPI
 @ExperimentalCoroutinesApi

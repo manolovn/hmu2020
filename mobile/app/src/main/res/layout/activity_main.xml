@@ -6,9 +6,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        tools:context=".MainActivity">
+        tools:context=".home.HomeActivity">
 
-    <me.amryousef.webrtc_demo.CameraDrawingView
+    <me.amryousef.webrtc_demo.home.editor.CameraDrawingView
             android:id="@+id/local_view"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -1,6 +1,7 @@
-package me.amryousef.webrtc_demo
+package me.amryousef.webrtc_demo.shared
 
 import com.google.gson.*
+import me.amryousef.webrtc_demo.home.editor.TouchEvent
 import java.lang.reflect.Type
 
 object TouchEventType {

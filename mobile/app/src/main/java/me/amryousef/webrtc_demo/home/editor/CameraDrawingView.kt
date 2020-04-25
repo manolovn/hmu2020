@@ -1,4 +1,4 @@
-package me.amryousef.webrtc_demo
+package me.amryousef.webrtc_demo.home.editor
 
 import android.content.Context
 import android.graphics.*

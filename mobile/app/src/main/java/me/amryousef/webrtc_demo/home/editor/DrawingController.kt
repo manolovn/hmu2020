@@ -1,8 +1,9 @@
-package me.amryousef.webrtc_demo
+package me.amryousef.webrtc_demo.home.editor
 
 import android.util.Log
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import me.amryousef.webrtc_demo.shared.TouchEventType
 
 sealed class TouchEvent {
     abstract val type: String

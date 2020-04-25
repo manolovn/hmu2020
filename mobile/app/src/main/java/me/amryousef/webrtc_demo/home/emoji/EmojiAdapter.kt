@@ -1,4 +1,4 @@
-package me.amryousef.webrtc_demo.emoji
+package me.amryousef.webrtc_demo.home.emoji
 
 import android.content.Context
 import android.view.LayoutInflater

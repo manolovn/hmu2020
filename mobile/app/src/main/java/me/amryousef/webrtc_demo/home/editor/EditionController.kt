@@ -1,10 +1,13 @@
-package me.amryousef.webrtc_demo
+package me.amryousef.webrtc_demo.home.editor
 
 import android.view.MotionEvent
 import android.view.View
 import io.ktor.util.KtorExperimentalAPI
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import me.amryousef.webrtc_demo.home.editor.DrawingController
+import me.amryousef.webrtc_demo.home.editor.DrawingEventsDispatcher
+import me.amryousef.webrtc_demo.home.editor.TouchEvent
 
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
